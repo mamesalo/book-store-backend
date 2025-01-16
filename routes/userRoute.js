@@ -86,6 +86,9 @@ router.post("/login", async (req, res) => {
         url = `${process.env.BASE_URL}/user/${user._id}/verify/${token.token}`;
       }
       await sendEmail(user.email, "Verify your email address", url);
+      return res
+        .status(401)
+        .send({ message: "Email not verified. Verification email sent" });
     }
     // Generate JWT token with user ID included
     const token = jwt.sign(
