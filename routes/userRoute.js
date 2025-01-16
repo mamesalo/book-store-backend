@@ -5,9 +5,10 @@ import { User } from "../model/userModel.js";
 import { Token } from "../model/token.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto";
+import dotenv from "dotenv";
 
 const router = express.Router();
-
+dotenv.config();
 // Route for User signup
 router.post("/signup", async (req, res) => {
   try {
@@ -35,7 +36,13 @@ router.post("/signup", async (req, res) => {
       token: crypto.randomBytes(32).toString("hex"),
     });
 
+    console.log("Basic url from env");
+    console.log(process.env.BASE_URL);
+
     const url = `${process.env.BASE_URL}/user/${newUser._id}/verify/${token.token}`;
+    console.log("url");
+    console.log(URL);
+
     await sendEmail(newUser.email, "Verify your email address", url);
 
     console.log("success sent email");
@@ -47,7 +54,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Route for User login
+// Route for User login.
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -72,6 +79,8 @@ router.post("/login", async (req, res) => {
           userId: user._id,
           token: crypto.randomBytes(32).toString("hex"),
         });
+        console.log(process.env.BASE_URL);
+
         url = `${process.env.BASE_URL}/user/${user._id}/verify/${newToken.token}`;
       } else {
         url = `${process.env.BASE_URL}/user/${user._id}/verify/${token.token}`;
@@ -115,6 +124,8 @@ router.get("/:id/verify/:token", async (req, res) => {
 
     res.status(200).send({ message: "Email verified successfully" });
   } catch (error) {
+    console.log(error);
+
     res.status(500).send({ message: error.message });
   }
 });
